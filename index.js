@@ -1,7 +1,7 @@
 const Express = require('express')
 const bodyParser = require('body-parser')
 const MongoClient = require('mongodb').MongoClient
-
+const { ObjectId } = require('mongodb')
 const DB_URL = 'mongodb://localhost:27017'
 const DB_NAME = 'user'
 
@@ -43,12 +43,16 @@ app.get('/userDetails', (request, response) => {
   })
 })
 
-app.put('/userDetails', (request, response) => {
-  let id = request.query.id
-  collection.findOneAndUpdate(
-    { _id: id },
-    { $set: request.body },
-    { new: true, upsert: true, returnOriginal: false }
+app.put('/userDetails/:id', (request, response) => {
+  const update = collection.findOneAndUpdate(
+    { _id: ObjectId(request.params.id) },
+    { $set: request.body }
   )
-  response.status(200).send(true)
+  response.send(update)
+})
+
+app.delete('/userDetails/:id', (request, response) => {
+  const delete1 = collection.deleteOne({ _id: ObjectId(request.params.id) })
+
+  response.send(delete1)
 })
